@@ -10,6 +10,8 @@ import {
   ScrollView,
   Alert,
   FlatList,
+  SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import { Colors } from "../../constants/Colors";
 import * as ImagePicker from "expo-image-picker";
@@ -18,6 +20,9 @@ import { useForm, Controller } from "react-hook-form";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import firestore from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
+import auth from "@react-native-firebase/auth";
+import { Timestamp } from "@react-native-firebase/firestore";
+import { router } from 'expo-router';
 
 type WineForm = {
   name: string;
@@ -25,13 +30,27 @@ type WineForm = {
   description: string;
 };
 
-type Wine = WineForm & { id: string; imageUri: string };
+type Wine = Omit<WineForm, 'harvestYear'> & {
+  id: string;
+  imageUri: string;
+  harvestYear: Timestamp;
+  userId: string; // Add this line
+};
+
+const EmptyWineList = () => (
+  <View style={styles.emptyList}>
+    <Text style={styles.emptyListEmoji}>🍷</Text>
+    <Text style={styles.emptyListText}>No wines added yet.</Text>
+    <Text style={styles.emptyListSubText}>Tap the "Add Wine" button to get started!</Text>
+  </View>
+);
 
 export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
   const [image, setImage] = useState<string | null>(null);
   const [wines, setWines] = useState<Wine[]>([]);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     control,
     handleSubmit,
@@ -46,7 +65,15 @@ export default function Home() {
 
   const fetchWines = async () => {
     try {
-      const snapshot = await firestore().collection("wines").get();
+      const userId = auth().currentUser?.uid;
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+      const snapshot = await firestore()
+        .collection("users")
+        .doc(userId)
+        .collection("wines")
+        .get();
       const fetchedWines = snapshot.docs.map(
         (doc) => ({ id: doc.id, ...doc.data() } as Wine)
       );
@@ -110,14 +137,19 @@ export default function Home() {
       Alert.alert("Error", "Please select an image for the wine.");
       return;
     }
+    setIsLoading(true);
     try {
       const imageUrl = await uploadImage(image);
-      const newWine: Omit<Wine, "id"> = {
-        imageUri: imageUrl,
+      const newWine = {
         ...data,
         harvestYear: firestore.Timestamp.fromDate(data.harvestYear),
+        imageUri: imageUrl, // Store the image URL
       };
-      await firestore().collection("wines").add(newWine);
+      await firestore()
+        .collection("users")
+        .doc(auth().currentUser?.uid)
+        .collection("wines")
+        .add(newWine);
       await fetchWines(); // Refresh the wine list
       reset();
       setImage(null);
@@ -125,32 +157,48 @@ export default function Home() {
     } catch (error) {
       console.error("Error uploading wine:", error);
       Alert.alert("Error", "Failed to upload wine");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const renderWineItem = ({ item }: { item: Wine }) => (
-    <View style={styles.wineItem}>
-      <Image source={{ uri: item.imageUri }} style={styles.wineImage} />
-      <View style={styles.wineInfo}>
-        <Text style={styles.wineName}>{item.name}</Text>
-        <Text style={styles.wineYear}>
-          {item.harvestYear.toDate().getFullYear()}
-        </Text>
-        <Text style={styles.wineDescription} numberOfLines={2}>
-          {item.description}
-        </Text>
+    <TouchableOpacity
+      onPress={() => router.push({
+        pathname: '/detailWine',
+        params: {
+          id: item.id,
+          name: item.name,
+          imageUri: item.imageUri,
+          harvestYear: item.harvestYear.toDate().getFullYear(),
+          description: item.description,
+        },
+      })}
+    >
+      <View style={styles.wineItem}>
+        <Image source={{ uri: item.imageUri }} style={styles.wineImage} />
+        <View style={styles.wineInfo}>
+          <Text style={styles.wineName}>{item.name}</Text>
+          <Text style={styles.wineYear}>
+            {item.harvestYear.toDate().getFullYear()}
+          </Text>
+          <Text style={styles.wineDescription} numberOfLines={2}>
+            {item.description}
+          </Text>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>My Wine Collection</Text>
       <FlatList
         data={wines}
         renderItem={renderWineItem}
         keyExtractor={(item) => item.id}
         style={styles.wineList}
+        ListEmptyComponent={EmptyWineList}
       />
       <TouchableOpacity
         style={styles.addButton}
@@ -245,8 +293,14 @@ export default function Home() {
                   <TouchableOpacity
                     style={styles.submitButton}
                     onPress={handleSubmit(onSubmit)}
+                    disabled={isLoading}
                   >
-                    <Text style={styles.submitButtonText}>Upload Wine</Text>
+                    {isLoading ? (
+                      <ActivityIndicator size="small" color={Colors.marshland[50]} style={styles.loadingIndicator} />
+                    ) : null}
+                    <Text style={styles.submitButtonText}>
+                      {isLoading ? "Uploading..." : "Upload Wine"}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -254,7 +308,7 @@ export default function Home() {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -337,10 +391,15 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
   },
   submitButtonText: {
     color: Colors.marshland[50],
     fontWeight: "bold",
+  },
+  loadingIndicator: {
+    marginRight: 10,
   },
   label: {
     fontSize: 16,
@@ -384,5 +443,27 @@ const styles = StyleSheet.create({
   wineDescription: {
     fontSize: 14,
     color: Colors.marshland[100],
+  },
+  emptyList: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  emptyListEmoji: {
+    fontSize: 64,
+    marginBottom: 20,
+  },
+  emptyListText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.marshland[100],
+    textAlign: 'center',
+  },
+  emptyListSubText: {
+    fontSize: 14,
+    color: Colors.marshland[300],
+    textAlign: 'center',
+    marginTop: 10,
   },
 });

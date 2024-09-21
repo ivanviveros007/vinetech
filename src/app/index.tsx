@@ -3,6 +3,7 @@ import { Redirect } from "expo-router";
 import { useAuthStore } from "@/src/store/useAuthStore";
 import auth from "@react-native-firebase/auth";
 import { View, Text, ActivityIndicator } from "react-native";
+import "@react-native-firebase/app";
 
 export default function InitialScreen() {
   const setUser = useAuthStore((state) => state.setUser);

@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
+    "@react-native-community/datetimepicker": "8.0.1",
     "@react-native-firebase/app": "^20.4.0",
     "@react-native-firebase/auth": "^20.4.0",
     "@react-native-firebase/firestore": "^20.4.0",
@@ -46,6 +47,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.53.0",
     "react-native": "0.74.5",
+    "react-native-confirmation-code-field": "^7.4.0",
     "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-modal-datetime-picker": "^18.0.0",
@@ -54,8 +56,7 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "15.2.0",
     "react-native-web": "~0.19.10",
-    "zustand": "^5.0.0-rc.2",
-    "@react-native-community/datetimepicker": "8.0.1"
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -18,6 +18,13 @@ const authLayout = () => {
           headerTransparent: true,
         }}
       />
+      <Stack.Screen
+        name="verifyCode"
+        options={{
+          headerTitle: "",
+          headerTransparent: true,
+        }}
+      />
     </Stack>
   );
 };

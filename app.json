@@ -17,7 +17,14 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.vinetech.mobile",
       "buildNumber": "1",
-      "FirebaseAppDelegateProxyEnabled": true
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["myapp"]
+          }
+        ],
+        "FirebaseAppDelegateProxyEnabled": true
+      }
     },
     "android": {
       "versionCode": 1,
@@ -27,7 +34,12 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "com.vinetech.mobile",
-      "permissions": ["android.permission.RECORD_AUDIO"]
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "RECEIVE_SMS",
+        "READ_SMS",
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "bundler": "metro",
