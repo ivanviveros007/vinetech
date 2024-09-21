@@ -10,6 +10,7 @@ import {
 import { useLocalSearchParams } from "expo-router";
 import { Wine } from "@/src/types/wine";
 import { Colors } from "@/src/constants/Colors";
+import { Image as ExpoImage } from 'expo-image';
 
 export default function WineDetail() {
   const params = useLocalSearchParams<Wine>();
@@ -18,41 +19,29 @@ export default function WineDetail() {
 
   console.log("Image URI:", params.imageUri);
 
-  const testImageUrl = "https://reactnative.dev/img/tiny_logo.png"; // Test image
-
   return (
     <ScrollView style={styles.container}>
-      {/* Firebase Image */}
-      <View style={styles.imageContainer}>
-        <Image 
-          source={{ uri: params.imageUri }}
-          style={styles.image} 
-          onError={(e) => {
-            console.error("Firebase Image loading error:", e.nativeEvent.error);
-            setImageError(true);
-          }}
-          onLoad={() => {
-            console.log("Firebase Image loaded successfully");
-            setLoading(false);
-          }}
-        />
-        {loading && <ActivityIndicator size="large" color={Colors.marshland[300]} />}
-      </View>
-
-      {/* Test Image */}
-      <View style={styles.imageContainer}>
-        <Image 
-          source={{ uri: testImageUrl }}
-          style={styles.image} 
-          onError={(e) => {
-            console.error("Test Image loading error:", e.nativeEvent.error);
-          }}
-          onLoad={() => {
-            console.log("Test Image loaded successfully");
-          }}
-        />
-      </View>
-
+      {params.imageUri && !imageError ? (
+        <View style={styles.imageContainer}>
+          <ExpoImage 
+            source={{ uri: params.imageUri }}
+            style={styles.image} 
+            onError={(error) => {
+              console.error("Image loading error:", error);
+              setImageError(true);
+            }}
+            onLoadEnd={() => {
+              console.log("Image loaded successfully");
+              setLoading(false);
+            }}
+          />
+          {loading && <ActivityIndicator size="large" color={Colors.marshland[300]} />}
+        </View>
+      ) : (
+        <View style={[styles.image, styles.placeholderImage]}>
+          <Text style={styles.placeholderText}>No image available</Text>
+        </View>
+      )}
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{params.name}</Text>
         <Text style={styles.detail}>Variety: {params.variety}</Text>

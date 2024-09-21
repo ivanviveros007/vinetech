@@ -23,7 +23,10 @@
             "CFBundleURLSchemes": ["myapp"]
           }
         ],
-        "FirebaseAppDelegateProxyEnabled": true
+        "FirebaseAppDelegateProxyEnabled": true,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       }
     },
     "android": {
@@ -38,7 +41,8 @@
         "android.permission.RECORD_AUDIO",
         "RECEIVE_SMS",
         "READ_SMS",
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "INTERNET"
       ]
     },
     "web": {
