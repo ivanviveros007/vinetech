@@ -1,40 +1,40 @@
 {
   "project_info": {
-    "project_number": "676982547514",
-    "project_id": "vine-tech-ia",
-    "storage_bucket": "vine-tech-ia.appspot.com"
+    "project_number": "981054077247",
+    "project_id": "vinetech-ia",
+    "storage_bucket": "vinetech-ia.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:676982547514:android:2eac9d697fdc21b2944103",
+        "mobilesdk_app_id": "1:981054077247:android:46e1f5e3badb15fae07b8a",
         "android_client_info": {
           "package_name": "com.vinetech.mobile"
         }
       },
       "oauth_client": [
         {
-          "client_id": "676982547514-6lj6kklgkiejovgtpdphq159lspeg7ur.apps.googleusercontent.com",
+          "client_id": "981054077247-8bd7hsl0ib0nj68e2l49rcjodh6i8qt1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA9_A7BnnepoaeA0KRx1ZQjEXVapQsOA74"
+          "current_key": "AIzaSyBAFdvGtRdPDtwvFpzJd66xo7Sgz3vZH-Q"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "676982547514-6lj6kklgkiejovgtpdphq159lspeg7ur.apps.googleusercontent.com",
+              "client_id": "981054077247-8bd7hsl0ib0nj68e2l49rcjodh6i8qt1.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "676982547514-tm6q1om6a6cohibm2i8ltsr02eocb4ab.apps.googleusercontent.com",
+              "client_id": "981054077247-ssbgcftcr7g8i0j0ors2l76mbibcgjvv.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.vinetech.mobile"
+                "bundle_id": "com.vinetech.com"
               }
             }
           ]

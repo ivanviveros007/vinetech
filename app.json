@@ -16,7 +16,8 @@
       "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
       "bundleIdentifier": "com.vinetech.mobile",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "FirebaseAppDelegateProxyEnabled": true
     },
     "android": {
       "versionCode": 1,

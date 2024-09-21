@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>676982547514-tm6q1om6a6cohibm2i8ltsr02eocb4ab.apps.googleusercontent.com</string>
+	<string>981054077247-ssbgcftcr7g8i0j0ors2l76mbibcgjvv.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.676982547514-tm6q1om6a6cohibm2i8ltsr02eocb4ab</string>
+	<string>com.googleusercontent.apps.981054077247-ssbgcftcr7g8i0j0ors2l76mbibcgjvv</string>
 	<key>API_KEY</key>
-	<string>AIzaSyAWzmjywM7bEp-chf3HL5IHYex8jnFlyto</string>
+	<string>AIzaSyC5W5DwKYG_3b0fiPwMDE4Zvx_Py8OG8tg</string>
 	<key>GCM_SENDER_ID</key>
-	<string>676982547514</string>
+	<string>981054077247</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.vinetech.mobile</string>
+	<string>com.vinetech.com</string>
 	<key>PROJECT_ID</key>
-	<string>vine-tech-ia</string>
+	<string>vinetech-ia</string>
 	<key>STORAGE_BUCKET</key>
-	<string>vine-tech-ia.appspot.com</string>
+	<string>vinetech-ia.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:676982547514:ios:f2348aec535c031e944103</string>
+	<string>1:981054077247:ios:530c8856c8caa020e07b8a</string>
 </dict>
 </plist>
