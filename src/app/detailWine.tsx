@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   ScrollView,
   ActivityIndicator,
@@ -10,33 +9,50 @@ import {
 import { useLocalSearchParams } from "expo-router";
 import { Wine } from "@/src/types/wine";
 import { Colors } from "@/src/constants/Colors";
-import { Image as ExpoImage } from 'expo-image';
+import { Image } from "expo-image";
 
 export default function WineDetail() {
   const params = useLocalSearchParams<Wine>();
+  const [imageData, setImageData] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  console.log("Image URI:", params.imageUri);
+  useEffect(() => {
+    const fetchImage = async () => {
+      if (params.imageUri) {
+        try {
+          const response = await fetch(params.imageUri);
+          const blob = await response.blob();
+          const reader = new FileReader();
+          reader.onload = () => {
+            setImageData(reader.result as string);
+            setLoading(false);
+          };
+          reader.readAsDataURL(blob);
+        } catch (error) {
+          console.error("Error fetching image:", error);
+          setImageError(true);
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchImage();
+  }, [params.imageUri]);
 
   return (
     <ScrollView style={styles.container}>
-      {params.imageUri && !imageError ? (
-        <View style={styles.imageContainer}>
-          <ExpoImage 
-            source={{ uri: params.imageUri }}
-            style={styles.image} 
-            onError={(error) => {
-              console.error("Image loading error:", error);
-              setImageError(true);
-            }}
-            onLoadEnd={() => {
-              console.log("Image loaded successfully");
-              setLoading(false);
-            }}
-          />
-          {loading && <ActivityIndicator size="large" color={Colors.marshland[300]} />}
-        </View>
+      {imageData && !imageError ? (
+        <Image
+          source={{ uri: imageData }}
+          style={styles.image}
+          onError={(e) => {
+            console.error("Image loading error:", e.nativeEvent.error);
+            setImageError(true);
+          }}
+        />
+      ) : loading ? (
+        <ActivityIndicator size="large" color={Colors.marshland[300]} />
       ) : (
         <View style={[styles.image, styles.placeholderImage]}>
           <Text style={styles.placeholderText}>No image available</Text>
@@ -61,10 +77,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.marshland[900],
   },
   imageContainer: {
-    width: '100%',
+    width: "100%",
     height: 300,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   image: {
     width: "100%",
