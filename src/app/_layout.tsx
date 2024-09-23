@@ -8,7 +8,6 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import "../firebaseConfig";
 
 import { useColorScheme } from "@/src/hooks/useColorScheme";
 
@@ -37,7 +36,17 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
-        <Stack.Screen name="detailWine" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="detailWine"
+          options={{
+            headerShown: true,
+            headerTransparent: true,
+            title: "",
+            headerBackTitle: "Volver",
+            headerBackVisible: true,
+            headerTintColor: "white",
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

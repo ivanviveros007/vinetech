@@ -13,46 +13,18 @@ import { Image } from "expo-image";
 
 export default function WineDetail() {
   const params = useLocalSearchParams<Wine>();
-  const [imageData, setImageData] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchImage = async () => {
-      if (params.imageUri) {
-        try {
-          const response = await fetch(params.imageUri);
-          const blob = await response.blob();
-          const reader = new FileReader();
-          reader.onload = () => {
-            setImageData(reader.result as string);
-            setLoading(false);
-          };
-          reader.readAsDataURL(blob);
-        } catch (error) {
-          console.error("Error fetching image:", error);
-          setImageError(true);
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchImage();
-  }, [params.imageUri]);
 
   return (
     <ScrollView style={styles.container}>
-      {imageData && !imageError ? (
+      {params.imageUri ? (
         <Image
-          source={{ uri: imageData }}
+          source={{ uri: params.imageUri }}
           style={styles.image}
-          onError={(e) => {
-            console.error("Image loading error:", e.nativeEvent.error);
-            setImageError(true);
+          contentFit="cover"
+          onError={(error) => {
+            console.error("Image loading error:", error);
           }}
         />
-      ) : loading ? (
-        <ActivityIndicator size="large" color={Colors.marshland[300]} />
       ) : (
         <View style={[styles.image, styles.placeholderImage]}>
           <Text style={styles.placeholderText}>No image available</Text>
@@ -62,7 +34,7 @@ export default function WineDetail() {
         <Text style={styles.name}>{params.name}</Text>
         <Text style={styles.detail}>Variety: {params.variety}</Text>
         <Text style={styles.detail}>
-          Harvest Year: {new Date(params.hervestYear).getFullYear()}
+          Harvest Year: {new Date(params.harvestYear).getFullYear()}
         </Text>
         <Text style={styles.detail}>Rating: {params.rating}/5</Text>
         <Text style={styles.notes}>{params.notes}</Text>
@@ -85,7 +57,6 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 300,
-    resizeMode: "cover",
   },
   infoContainer: {
     padding: 20,
