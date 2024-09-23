@@ -18,6 +18,7 @@ import { uploadImage } from "@/src/utils/imageUtils";
 import { subscribeToWines } from "@/src/utils/firestoreUtils";
 import { Wine, WineForm } from "./types";
 import { WineItem } from "./components/WineItem";
+import { SearchBar } from "./components/SearchBar";
 
 import { styles } from "./styles";
 
@@ -26,12 +27,15 @@ export default function Home() {
   const [image, setImage] = useState<string | null>(null);
   const [wines, setWines] = useState<Wine[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [filteredWines, setFilteredWines] = useState<Wine[]>([]); // Lista filtrada
+  const [searchTerm, setSearchTerm] = useState<string>(""); // Estado para el término de búsqueda
   const { reset } = useForm<WineForm>();
 
   useEffect(() => {
     const unsubscribe = subscribeToWines(
       (fetchedWines) => {
         setWines(fetchedWines);
+        setFilteredWines(fetchedWines); // Inicialmente, no hay filtro aplicado
       },
       (error) => {
         console.error("Error fetching wines in real-time:", error);
@@ -39,8 +43,11 @@ export default function Home() {
       }
     );
 
-    // Limpiar la suscripción cuando el componente se desmonte
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   const onSubmit = async (data: WineForm, image: string | null) => {
@@ -69,11 +76,28 @@ export default function Home() {
     }
   };
 
+  const handleSearch = (text: string) => {
+    setSearchTerm(text); // Actualizamos el término de búsqueda
+
+    if (text === "") {
+      // Si no hay texto en la búsqueda, mostramos todos los vinos
+      setFilteredWines(wines);
+    } else {
+      // Filtramos la lista de vinos por el nombre
+      const filtered = wines.filter((wine) =>
+        wine.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredWines(filtered);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>My Wine Collection</Text>
+
+      <SearchBar searchTerm={searchTerm} onSearch={handleSearch} />
       <FlatList
-        data={wines}
+        data={filteredWines}
         renderItem={({ item }) => <WineItem item={item} />}
         keyExtractor={(item) => item.id}
         style={styles.wineList}

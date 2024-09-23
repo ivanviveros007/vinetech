@@ -1,10 +1,10 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text as RNText } from "react-native";
 import { ThemedText as Text } from "@/src/components/ThemedText";
 import { Colors } from "@/src/constants/Colors";
 
 export const EmptyWineList = () => (
   <View style={styles.emptyList}>
-    <Text style={styles.emptyListEmoji}>🍷</Text>
+    <RNText style={styles.emptyListEmoji}>🍷</RNText>
     <Text style={styles.emptyListText}>No wines added yet.</Text>
     <Text style={styles.emptyListSubText}>
       Tap the "Add Wine" button to get started!
@@ -14,10 +14,10 @@ export const EmptyWineList = () => (
 
 const styles = StyleSheet.create({
   emptyList: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
+    marginTop: "50%",
   },
   emptyListEmoji: {
     fontSize: 64,
