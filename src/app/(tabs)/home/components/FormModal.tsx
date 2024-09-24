@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Modal,
   StyleSheet,
-  Alert
+  Alert,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -33,6 +33,7 @@ export const FormModal = ({
 }: FormModalProps) => {
   const [image, setImage] = useState<string | null>(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [rating, setRating] = useState(0);
   const {
     control,
     handleSubmit,
@@ -72,7 +73,49 @@ export const FormModal = ({
       Alert.alert("Error", "Please select an image for the wine.");
       return;
     }
-    onSubmit(data, image);  // Pasamos los datos del formulario y la imagen al padre (Home)
+    onSubmit({ ...data, rating }, image);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    // Reset form state here if needed
+  };
+
+  const handleRating = (selectedRating: number) => {
+    if (rating === selectedRating) {
+      // If tapping the same star, toggle between whole and half star
+      setRating(selectedRating - 0.5);
+    } else {
+      setRating(selectedRating);
+    }
+  };
+
+  const renderStar = (index: number) => {
+    const starValue = index + 1;
+    const isHalfStar = rating === starValue - 0.5;
+    const isFullStar = rating >= starValue;
+
+    return (
+      <TouchableOpacity
+        key={index}
+        onPress={() => handleRating(starValue)}
+        style={styles.starContainer}
+      >
+        <Ionicons
+          name={isFullStar ? "star" : "star-outline"}
+          size={30}
+          color={Colors.marshland[500]}
+        />
+        {isHalfStar && (
+          <Ionicons
+            name="star-half"
+            size={30}
+            color={Colors.marshland[500]}
+            style={styles.halfStar}
+          />
+        )}
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -80,11 +123,17 @@ export const FormModal = ({
       animationType="slide"
       transparent={true}
       visible={modalVisible}
-      onRequestClose={() => setModalVisible(false)}
+      onRequestClose={handleCloseModal}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <ScrollView>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={handleCloseModal}
+          >
+            <Ionicons name="close" size={24} color={Colors.marshland[100]} />
+          </TouchableOpacity>
+          <ScrollView showsVerticalScrollIndicator={false}>
             {!image ? (
               <View style={styles.bottomSheet}>
                 <TouchableOpacity style={styles.option} onPress={takePicture}>
@@ -107,6 +156,7 @@ export const FormModal = ({
             ) : (
               <View style={styles.form}>
                 <Image source={{ uri: image }} style={styles.image} />
+
                 <Text style={styles.label}>Wine Name</Text>
                 <Controller
                   control={control}
@@ -126,12 +176,31 @@ export const FormModal = ({
                   <Text style={styles.errorText}>{errors.name.message}</Text>
                 )}
 
+                <Text style={styles.label}>Store Name</Text>
+                <Controller
+                  control={control}
+                  rules={{ required: "Store name is required" }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      style={styles.input}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="Enter store name"
+                    />
+                  )}
+                  name="storeName"
+                />
+                {errors.storeName && (
+                  <Text style={styles.errorText}>
+                    {errors.storeName.message}
+                  </Text>
+                )}
+
                 <Text style={styles.label}>Harvest Year</Text>
                 <TouchableOpacity onPress={showDatePicker} style={styles.input}>
                   <Text>
-                    {control._formValues.harvestYear
-                      ? control._formValues.harvestYear.getFullYear()
-                      : "Select Year"}
+                    {control._formValues.harvestYear || "Select Year"}
                   </Text>
                 </TouchableOpacity>
                 <DateTimePickerModal
@@ -139,6 +208,8 @@ export const FormModal = ({
                   mode="date"
                   onConfirm={handleConfirm}
                   onCancel={hideDatePicker}
+                  display="spinner"
+                  maximumDate={new Date()}
                 />
 
                 <Text style={styles.label}>Description</Text>
@@ -156,6 +227,12 @@ export const FormModal = ({
                   )}
                   name="description"
                 />
+
+                <Text style={styles.label}>Rating</Text>
+                <View style={styles.ratingContainer}>
+                  {[0, 1, 2, 3, 4].map(renderStar)}
+                </View>
+                <Text style={styles.ratingText}>{rating.toFixed(1)}/5</Text>
 
                 <TouchableOpacity
                   style={styles.submitButton}
@@ -259,5 +336,32 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     marginBottom: 10,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 1,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 5,
+  },
+  ratingText: {
+    textAlign: "center",
+    color: Colors.marshland[100],
+    fontSize: 16,
+    marginBottom: 15,
+  },
+
+  starContainer: {
+    position: "relative",
+    padding: 5,
+  },
+  halfStar: {
+    position: "absolute",
+    left: 5,
+    top: 5,
   },
 });

@@ -4,6 +4,7 @@ export type WineForm = {
   name: string;
   harvestYear: Date;
   description: string;
+  rating: number;
 };
 
 export type Wine = Omit<WineForm, "harvestYear"> & {

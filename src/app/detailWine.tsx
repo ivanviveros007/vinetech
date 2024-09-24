@@ -5,14 +5,32 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Wine } from "@/src/types/wine";
 import { Colors } from "@/src/constants/Colors";
 import { Image } from "expo-image";
+import { Share } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import * as Sharing from 'expo-sharing';
+import * as Linking from 'expo-linking';
 
 export default function WineDetail() {
   const params = useLocalSearchParams<Wine>();
+
+  const handleShare = async () => {
+    const url = Linking.createURL(`/wine/${params.id}`);
+    
+    if (await Sharing.isAvailableAsync()) {
+      await Share.share({
+        message: `Check out this wine: ${url}`,
+        url: url,
+      });
+    } else {
+      alert('Sharing is not available on this device');
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -39,6 +57,9 @@ export default function WineDetail() {
         <Text style={styles.detail}>Rating: {params.rating}/5</Text>
         <Text style={styles.notes}>{params.notes}</Text>
       </View>
+      <TouchableOpacity onPress={handleShare}>
+        <FontAwesome name="share-alt" size={24} color="black" />
+      </TouchableOpacity>
     </ScrollView>
   );
 }
