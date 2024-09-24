@@ -12,12 +12,11 @@ import {
   Alert,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/src/constants/Colors";
 import * as ImagePicker from "expo-image-picker";
 import { WineForm } from "../types";
-
+import { Picker } from "@react-native-picker/picker";
 type FormModalProps = {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
@@ -32,8 +31,8 @@ export const FormModal = ({
   isLoading,
 }: FormModalProps) => {
   const [image, setImage] = useState<string | null>(null);
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [rating, setRating] = useState(0);
+  const [isYearPickerVisible, setYearPickerVisible] = useState(false);
   const {
     control,
     handleSubmit,
@@ -59,13 +58,6 @@ export const FormModal = ({
       quality: 1,
     });
     if (!result.canceled) setImage(result.assets[0].uri);
-  };
-
-  const showDatePicker = () => setDatePickerVisibility(true);
-  const hideDatePicker = () => setDatePickerVisibility(false);
-  const handleConfirm = (date: Date) => {
-    setValue("harvestYear", date);
-    hideDatePicker();
   };
 
   const submitForm = (data: WineForm) => {
@@ -118,6 +110,12 @@ export const FormModal = ({
     );
   };
 
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(new Array(100), (val, index) => currentYear - index);
+
+  const showYearPicker = () => setYearPickerVisible(true);
+  const hideYearPicker = () => setYearPickerVisible(false);
+
   return (
     <Modal
       animationType="slide"
@@ -156,6 +154,37 @@ export const FormModal = ({
             ) : (
               <View style={styles.form}>
                 <Image source={{ uri: image }} style={styles.image} />
+                <TouchableOpacity
+                  style={styles.yearButton}
+                  onPress={showYearPicker}
+                >
+                  <Text style={styles.yearButtonText}>
+                    {control._formValues.harvestYear
+                      ? control._formValues.harvestYear.getFullYear()
+                      : "Select Year"}
+                  </Text>
+                </TouchableOpacity>
+
+                {isYearPickerVisible && (
+                  <Picker
+                    selectedValue={control._formValues.harvestYear?.getFullYear()}
+                    onValueChange={(year) => {
+                      const date = new Date();
+                      date.setFullYear(year);
+                      setValue("harvestYear", date);
+                      hideYearPicker();
+                    }}
+                    style={styles.picker}
+                  >
+                    {years.map((year) => (
+                      <Picker.Item
+                        key={year}
+                        label={year.toString()}
+                        value={year}
+                      />
+                    ))}
+                  </Picker>
+                )}
 
                 <Text style={styles.label}>Wine Name</Text>
                 <Controller
@@ -196,21 +225,6 @@ export const FormModal = ({
                     {errors.storeName.message}
                   </Text>
                 )}
-
-                <Text style={styles.label}>Harvest Year</Text>
-                <TouchableOpacity onPress={showDatePicker} style={styles.input}>
-                  <Text>
-                    {control._formValues.harvestYear || "Select Year"}
-                  </Text>
-                </TouchableOpacity>
-                <DateTimePickerModal
-                  isVisible={isDatePickerVisible}
-                  mode="date"
-                  onConfirm={handleConfirm}
-                  onCancel={hideDatePicker}
-                  display="spinner"
-                  maximumDate={new Date()}
-                />
 
                 <Text style={styles.label}>Description</Text>
                 <Controller
@@ -272,7 +286,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingHorizontal: 20,
     paddingBottom: 35,
-    maxHeight: "80%",
+    maxHeight: "90%",
   },
   bottomSheet: {
     padding: 20,
@@ -363,5 +377,30 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 5,
     top: 5,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  picker: {
+    height: 150,
+    width: "100%",
+    backgroundColor: Colors.marshland[100],
+    borderRadius: 5,
+    marginBottom: 15,
+    color: Colors.marshland[900],
+    justifyContent: "center", // Center the text vertically
+  },
+  yearButton: {
+    backgroundColor: Colors.marshland[100],
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+    alignItems: "center",
+  },
+  yearButtonText: {
+    color: Colors.marshland[900],
+    fontSize: 16,
   },
 });
